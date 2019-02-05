@@ -1,4 +1,5 @@
 import config from './config.js'
+import Game from './game.js'
 
 class App {
   constructor (idCanvas) {
@@ -6,7 +7,8 @@ class App {
     this.canvasId = idCanvas || id
     this.canvas = document.getElementById(this.canvasId) ? document.getElementById(this.canvasId) : this.createCanvas()
     this.ctx = this.canvas.getContext(context)
-    this.paint()
+    this.game = new Game(this.ctx)
+    this.game.paint()
   }
 
   createCanvas () {
@@ -17,12 +19,6 @@ class App {
     element.setAttribute('height', height)
     element.innerHTML = 'Canvas not supported'
     return document.body.appendChild(element)
-  }
-
-  paint () {
-    let { ctx } = this
-    ctx.fillStyle = '#0f0'
-    ctx.fillRect(50, 50, 100, 60)
   }
 }
 
