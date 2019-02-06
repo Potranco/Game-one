@@ -9,6 +9,13 @@ export default {
     backgroundColor: '#000',
     player: {
       color: '#0f0'
+    },
+    keyboard: {
+      KEY_LEFT: 37,
+      KEY_UP: 38,
+      KEY_RIGHT: 39,
+      KEY_DOWN: 40,
+      KEY_ENTER: 13
     }
   }
 }
