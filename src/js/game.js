@@ -3,17 +3,17 @@ import keyboard from './keyboard.js'
 
 class Game {
   constructor (ctx, debug = false) {
-    if (debug) {
-      this.lastUpdate = 0
-      this.FPS = 0
-      this.frames = 0
-      this.acumDelta = 0
-    }
     this.debug = debug ? this.debugOn : () => false
+    this.lastUpdate = 0
+    this.FPS = 0
+    this.frames = 0
+    this.acumDelta = 0
+    this.deltaTime = 0
+
     this.canvas = ctx.canvas
     this.ctx = ctx
 
-    this.distance = 4
+    this.distance = 120
     this.direction = 1
     this.x = 50
     this.y = 50
@@ -22,11 +22,9 @@ class Game {
     this.pause = false
 
     this.run()
-    this.paint()
   }
 
   paint () {
-    window.requestAnimationFrame(this.paint.bind(this))
     let { backgroundColor, player } = config.game
     let { ctx, canvas, x, y } = this
     ctx.fillStyle = backgroundColor
@@ -69,11 +67,12 @@ class Game {
 
   move () {
     let dir = this.whoDirection()
+    let distance = this.distance * this.deltaTime
     if (this.pause) return true
-    if (dir === 0) this.y -= this.distance
-    if (dir === 1) this.x += this.distance
-    if (dir === 2) this.y += this.distance
-    if (dir === 3) this.x -= this.distance
+    if (dir === 0) this.y -= distance
+    if (dir === 1) this.x += distance
+    if (dir === 2) this.y += distance
+    if (dir === 3) this.x -= distance
     if (this.x > this.canvas.width) this.x = 0
     if (this.y > this.canvas.height) this.y = 0
     if (this.x < 0) this.x = this.canvas.width
@@ -88,22 +87,26 @@ class Game {
   }
 
   run () {
-    setTimeout(this.run.bind(this), 20)
-    return !this.debug() && this.action()
+    window.requestAnimationFrame(this.run.bind(this))
+    this.controlFrames()
+    return !this.debug() && this.action() && this.paint()
   }
 
-  debugOn () {
+  controlFrames () {
     let now = Date.now()
-    let deltaTime = (now - this.lastUpdate) / 1000
-    if (deltaTime > 1) deltaTime = 0
+    this.deltaTime = (now - this.lastUpdate) / 1000
+    if (this.deltaTime > 1) this.deltaTime = 0
     this.lastUpdate = now
     this.frames++
-    this.acumDelta += deltaTime
+    this.acumDelta += this.deltaTime
     if (this.acumDelta > 1) {
       this.FPS = this.frames
       this.frames = 0
       this.acumDelta -= 1
     }
+  }
+
+  debugOn () {
     console.log('FPS:', this.FPS)
     return false
   }
