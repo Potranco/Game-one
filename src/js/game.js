@@ -1,5 +1,6 @@
 import config from './config.js'
 import keyboard from './keyboard.js'
+import Rectangle from './Rectangle.js'
 
 class Game {
   constructor (ctx, debug = false) {
@@ -15,23 +16,35 @@ class Game {
 
     this.distance = 120
     this.direction = 1
-    this.x = 50
-    this.y = 50
+
+    this.player = new Rectangle(40, 40, 10, 10, config.game.player.color)
+    this.food = new Rectangle(80, 80, 10, 10, config.game.food.color)
 
     this.lastKey = undefined
     this.pause = false
+    this.score = 0
 
     this.run()
   }
 
+  random (max) {
+    return Math.floor(Math.random() * max)
+  }
+
   paint () {
-    let { backgroundColor, player } = config.game
-    let { ctx, canvas, x, y } = this
+    let { backgroundColor } = config.game
+    let { ctx, canvas, player, food } = this
     ctx.fillStyle = backgroundColor
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
     ctx.fillStyle = player.color
-    ctx.fillRect(x, y, 10, 10)
+    player.fill(ctx)
+
+    ctx.fillStyle = food.color
+    food.fill(ctx)
+
+    ctx.fillStyle = '#fff'
+    ctx.fillText('Score: ' + this.score, 0, 10)
 
     if (this.pause) {
       this.ctx.textAlign = 'center'
@@ -41,7 +54,7 @@ class Game {
     return true
   }
 
-  whoDirection () {
+  whatDirection () {
     let {KEY_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_ENTER} = config.game.keyboard
     let dir = this.direction
     this.lastKey = keyboard.lastKeyPress()
@@ -66,23 +79,30 @@ class Game {
   }
 
   move () {
-    let dir = this.whoDirection()
+    let {player} = this
+    let dir = this.whatDirection()
     let distance = this.distance * this.deltaTime
     if (this.pause) return true
-    if (dir === 0) this.y -= distance
-    if (dir === 1) this.x += distance
-    if (dir === 2) this.y += distance
-    if (dir === 3) this.x -= distance
-    if (this.x > this.canvas.width) this.x = 0
-    if (this.y > this.canvas.height) this.y = 0
-    if (this.x < 0) this.x = this.canvas.width
-    if (this.y < 0) this.y = this.canvas.height
+    if (dir === 0) player.y -= distance
+    if (dir === 1) player.x += distance
+    if (dir === 2) player.y += distance
+    if (dir === 3) player.x -= distance
+    if (player.x > this.canvas.width) player.x = 0
+    if (player.y > this.canvas.height) player.y = 0
+    if (player.x < 0) player.x = this.canvas.width
+    if (player.y < 0) player.y = this.canvas.height
     this.direction = dir
     return true
   }
 
   action () {
+    let {player, food, canvas} = this
     this.move()
+    if (player.intersects(food)) {
+      this.score++
+      food.x = this.random(canvas.width / 10 - 1) * 10
+      food.y = this.random(canvas.height / 10 - 1) * 10
+    }
     return true
   }
 

@@ -10,6 +10,9 @@ export default {
     player: {
       color: '#0f0'
     },
+    food: {
+      color: '#f00'
+    },
     keyboard: {
       KEY_LEFT: 37,
       KEY_UP: 38,
