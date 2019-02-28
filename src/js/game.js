@@ -1,6 +1,9 @@
 import config from './config.js'
 import keyboard from './keyboard.js'
 import Rectangle from './Rectangle.js'
+import gamepad from './gamepad.js'
+
+console.log('gamepad', gamepad)
 
 class Game {
   constructor (ctx, debug = false) {
@@ -19,6 +22,8 @@ class Game {
 
     this.player = new Rectangle(40, 40, 10, 10, config.game.player.color)
     this.food = new Rectangle(80, 80, 10, 10, config.game.food.color)
+    this.colums = []
+    this.colums[0] = new Rectangle()
 
     this.lastKey = undefined
     this.pause = false
